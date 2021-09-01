@@ -1,9 +1,10 @@
 require('dotenv').config();
-const express = require('express')
 
+const mysql = require('mysql');
+const express = require('express');
 
-const app = express()
-const port = 8000
+const app = express();
+const port = process.env.HOST_PORT
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
