@@ -1,17 +1,28 @@
+require('dotenv').config();
 const mysql = require('mysql');
 
-export const connect = (host, user, pwd) => {
+const DB_HOST = process.env.DB_HOST;
+const DB_USER = process.env.DB_USERNAME
+const DB_PWD = process.env.DB_PASSWORD
+const DB_NAME = process.env.DB_NAME;
+
+const make_connection = (res) => {
   let con = mysql.createConnection({
-    host: host,
-    user: user,
-    password: pwd
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PWD,
+    database: DB_NAME
   });
 
   con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected");
+    if (err) {
+      res.send(err);
+      throw err;
+    } 
   });
 
-  return con
+  return con;
+
 };
 
+exports.make_connection = make_connection;

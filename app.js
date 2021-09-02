@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const mysql = require('mysql');
+const db = require('./connect.js');
 const express = require('express');
 
 const app = express();
@@ -10,7 +10,21 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/getTasks', (req, res) => {
+app.get('/tasks', (req, res) => {
+  let con = db.make_connection()
+  results = con.query("SELECT * FROM tasks;", function(err, result, something) {
+    if( err ) {
+      res.send(err)
+      throw err;
+    }
+
+    res.send(result);
+  });
+
+});
+
+
+app.get('/createEmptyTask', (req, res) => {
   res.send("Poopy");
 })
 
