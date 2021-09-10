@@ -1,26 +1,27 @@
 require('dotenv').config();
 
 const express = require('express');
-const cors = require('cors');
 const db = require('./connect.js');
+const bodyParser = require('body-parser');
 
+// Create and configure our express application
+const port = process.env.HOST_PORT
 const app = express();
 
-const port = process.env.HOST_PORT
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-app.use(cors())
-app.options('*', cors())
-
+// Start server
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Task Manager Backend is listening @ http://localhost:${port}`)
 })
 
-/**
- * Gets all the tasks in the database.
- */
+/** Gets all tasks from the database. */
 app.get('/tasks/get/all', (req, res) => {
   let con = db.make_connection()
-  results = con.query("SELECT * FROM tasks;", function(err, result, something) {
+  con.query("SELECT * FROM tasks;", function(err, result, something) {
     if( err ) {
       res.send(err)
       throw err;
@@ -28,80 +29,103 @@ app.get('/tasks/get/all', (req, res) => {
 
     res.send(result);
   });
+  
+  con.end();
 });
 
-/**
- * Gets the task with the matching id.
- */
+/** Gets the task with matching id from the database. */
 app.get('/tasks/get/id/:id', (req, res) => {
   let con = db.make_connection()
   const query = 'SELECT * FROM tasks WHERE task_id=' + req.params.id + ';';
 
-  results = con.query(query, function(err, result, something) {
+  con.query(query, function(err, result, something) {
     if( err ) {
       res.send(err)
       throw err;
     }
 
+    console.log('Fetched all tasks.');
     res.send(result);
   });
+
+  con.end();
 });
 
-/**
- * Gets the Task with the highest primary key i.e. the latest task added to the
- * database.
- */
+/** Gets the most recently added task from the database. */
 app.get('/tasks/get/latest', (req, res) => {
   let con = db.make_connection()
   const query = 'SELECT * FROM tasks ORDER BY task_id DESC LIMIT 0, 1;';
 
-  results = con.query(query, function(err, result, something) {
+  con.query(query, function(err, result, something) {
     if( err ) {
       res.send(err)
       throw err;
     }
 
+    console.log('Fetched latest task with task_id ' + result[0].task_id);
     res.send(result);
   });
+
+  con.end();
 })
 
-/**
- * Creates a new empty task.
- */
+/** Creates a new empty task. */
 app.post('/tasks/new/empty', (req, res) => {
   let con = db.make_connection()
   const query = 'INSERT INTO tasks (task_description) VALUES ("This is an empty task.");';
 
-  results = con.query(query, function(err, result, something) {
+  con.query(query, function(err, result, something) {
     if( err ) {
       res.send(err)
       throw err;
     }
 
-    res.send(result);
+    console.log("Created a new empty task.");
+    res.sendStatus(200);
   });
+
+  con.end();
 });
 
-app.delete('/tasks/delete/:selected', (req, res) => {
-
-  const selected  = req.query.selected;
-  const removed = []
-
-  let con = db.make_connection()
-
-  selected.forEach((elem) => {
-    const query = 'DELETE FROM tasks WHERE task_id=' + elem + ';';
-    results = con.query(query, function(err, result, something) {
+app.post('/tasks/save', (req, res) => {
+  let con = db.make_connection();
+  
+  const tasks = req.body;
+  tasks.forEach((element) => {
+    const query = 'UPDATE tasks SET task_description="' + element.task_description + '" WHERE task_id=' + element.task_id + ';';
+    con.query(query, function(err, result, something) {
       if( err ) {
         res.send(err)
         throw err;
       }  
 
-      removed.push(elem)
+      console.log('Updated task with task_id ' + element.task_id + ' with: ' + element[0]);
+    });
+  });
+
+  res.sendStatus(200);
+  con.end();
+});
+
+/** Deletes tasks with the matching task_ids from the database. */
+app.delete('/tasks/delete/:selected', (req, res) => {
+
+  const selected  = req.query.selected;
+  let con = db.make_connection()
+
+  selected.forEach((element) => {
+    const query = 'DELETE FROM tasks WHERE task_id=' + element + ';';
+    con.query(query, function(err, result, something) {
+      if( err ) {
+        res.send(err)
+        throw err;
+      }  
+
+      console.log("Deleted task with task_id " + element + " from tasks.");
     });
   })
 
-  console.log(removed);
-
-  res.json(removed);
+  res.sendStatus(200)
+  con.end();
 });
+
