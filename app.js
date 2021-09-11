@@ -92,7 +92,24 @@ app.post('/tasks/save', (req, res) => {
   
   const tasks = req.body;
   tasks.forEach((element) => {
-    const query = 'UPDATE tasks SET task_description="' + element.task_description + '" WHERE task_id=' + element.task_id + ';';
+
+    // Build our query
+    let query = "UPDATE tasks SET ";
+    if(element.task_description != null) {
+      query += 'task_description="' + element.task_description + '", '
+
+    } else {
+      query += 'task_description=NULL, '
+    }
+
+    if(element.task_date != null) {
+      query += 'task_date=DATE_FORMAT("' + parseDateString(element.task_date) + '", "%Y-%m-%d") ';
+    } else {
+      query += 'task_date=NULL '
+    }
+
+    query += 'WHERE task_id=' + element.task_id + ';';
+
     con.query(query, function(err, result, something) {
       if( err ) {
         res.send(err)
@@ -106,6 +123,10 @@ app.post('/tasks/save', (req, res) => {
   res.sendStatus(200);
   con.end();
 });
+
+const parseDateString = (date) => {
+  return date.split('T')[0]
+}
 
 /** Deletes tasks with the matching task_ids from the database. */
 app.delete('/tasks/delete/:selected', (req, res) => {
