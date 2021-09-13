@@ -37,7 +37,7 @@ connection.query('CREATE TABLE IF NOT EXISTS tasks( task_id INT NOT NULL AUTO_IN
 connection.commit();
 
 //CREATE TAGS TABLE
-connection.query('CREATE TABLE IF NOT EXISTS tags( tag_id INT NOT NULL AUTO_INCREMENT, tag_text VARCHAR(128), tag_fg VARCHAR(6), tag_bg VARCHAR(6), PRIMARY KEY (tag_id) );');
+connection.query('CREATE TABLE IF NOT EXISTS tags( tag_id INT NOT NULL AUTO_INCREMENT, tag_text VARCHAR(128), tag_fg VARCHAR(10), tag_bg VARCHAR(10), PRIMARY KEY (tag_id) );');
 connection.commit();
 
 //CREATE TASK-TAGS MAPPING TABLE
