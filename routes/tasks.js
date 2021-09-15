@@ -25,7 +25,33 @@ router.post('/new', (req, res) => {
 router.get('/get/all', (req, res) => {
 
   let con = db.make_connection()
+  let taskResult = null;
   con.query("SELECT * FROM tasks;", function(err, result, something) {
+    if( err ) {
+      res.send(err)
+      throw err;
+    }
+    
+    console.log(result);
+    taskResult = result;
+  });
+  
+  console.log(taskResult);
+
+  con.query("SELECT * FROM task_tags;", function(err, result, something) {
+    if( err ) {
+      res.send(err)
+      throw err;
+    }
+  })
+
+  con.end();
+});
+
+router.get('/get/tags', (req, res) => {
+  let con = db.make_connection();
+
+  con.query("SELECT * FROM task_tags;", function(err, result, something) {
     if( err ) {
       res.send(err)
       throw err;
@@ -33,7 +59,7 @@ router.get('/get/all', (req, res) => {
 
     res.send(result);
   });
-  
+
   con.end();
 });
 
