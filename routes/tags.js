@@ -55,6 +55,30 @@ router.post('/new', (req, res) => {
 
 })
 
+router.post('/save', (req, res) => {
+  let con = db.make_connection();
+
+  const tags = req.body;
+  tags.forEach((element) => {
+    let query = 'UPDATE tags SET ';
+    query += 'tag_text="' + element.tag_text + '", ';
+    query += 'tag_fg="' + element.tag_fg + '", ';
+    query += 'tag_bg="' + element.tag_bg + '" ';
+    query += 'WHERE tag_id=' + element.tag_id + ';';
+    con.query(query, (err, result, something) => {
+      if( err ) {
+        res.send(err)
+        throw err;
+      }
+  
+      console.log("Updated tag with tag_id " + element.tag_id + " with: " + element);
+      res.sendStatus(200);
+    })  
+  })
+  
+  con.end();
+})
+
 /** Deletes tags with the matching task_ids from the database. */
 router.delete('/delete/selected', (req, res) => {
 
