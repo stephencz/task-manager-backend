@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/get/all', (req, res) => {
   let con = db.make_connection();
 
-  con.query("SELECT * FROM tags;", function(err, result, something) {
+  con.query("SELECT * FROM tags;", (err, result, something) =>  {
     if( err ) {
       res.send(err)
       throw err;
@@ -23,7 +23,7 @@ router.get('/get/latest', (req, res) => {
   let con = db.make_connection()
   const query = 'SELECT * FROM tags ORDER BY tag_id DESC LIMIT 0, 1;';
 
-  con.query(query, function(err, result, something) {
+  con.query(query, (err, result, something) =>  {
     if( err ) {
       res.send(err)
       throw err;
@@ -86,11 +86,26 @@ router.delete('/delete/selected', (req, res) => {
   let con = db.make_connection()
 
   selected.forEach((element) => {
-    const query = 'DELETE FROM tags WHERE tag_id=' + element + ';';
-    con.query(query, function(err, result, something) {
+
+    // We must delete tag relations from the task_tags table before
+    // deleting any tags.
+    const q1 = 'DELETE FROM task_tags WHERE tag_id=' + element + ';';
+    con.query(q1, (err, result, something) => {
       if( err ) {
-        res.send(err)
-        throw err;
+        console.log(err);
+      res.send(err);
+      return;
+      }  
+
+      console.log("Deleted task_tag with tag_id " + element + " from task_tags.");
+    });
+
+    const q2 = 'DELETE FROM tags WHERE tag_id=' + element + ';';
+    con.query(q2, (err, result, something) => {
+      if( err ) {
+        console.log(err);
+      res.send(err);
+      return;
       }  
 
       console.log("Deleted tag with tag_id " + element + " from tags.");

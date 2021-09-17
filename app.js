@@ -4,6 +4,7 @@ const express = require('express');
 
 const taskRouter = require('./routes/tasks');
 const tagRouter = require('./routes/tags');
+const taskTagsRouter = require('./routes/task_tags');
 
 // Create and configure our express application
 const port = process.env.HOST_PORT || 8000
@@ -15,13 +16,14 @@ app.use(express.urlencoded({
 }))
 
 app.use('/api/v1/tasks/', taskRouter);
-app.use('/api/v1/tags', tagRouter);
+app.use('/api/v1/tags/', tagRouter);
+app.use('/api/v1/tasktags/', taskTagsRouter);
 
 app.get('/', (req, res) => {
-  res.send("Task Manager Backend V1")
+  res.send("Task Manager Backend v1")
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`Task Manager Backend is listening @ http://localhost:${port}`)
+  console.log(`Task Manager Backend v1 is listening @ http://localhost:${port}`)
 })
