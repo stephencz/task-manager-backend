@@ -17,7 +17,7 @@ app.use(express.urlencoded({
 
 app.use('/api/v1/tasks/', taskRouter);
 app.use('/api/v1/tags/', tagRouter);
-app.use('/api/v1/tasktags/', taskTagsRouter);
+app.use('/api/v1/task_tags/', taskTagsRouter);
 
 app.get('/', (req, res) => {
   res.send("Task Manager Backend v1")
