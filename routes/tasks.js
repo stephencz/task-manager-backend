@@ -90,7 +90,7 @@ router.post('/save', (req, res) => {
     // Build our query
     let query = "UPDATE tasks SET ";
     if(element.task_description != null) {
-      query += 'task_description="' + element.task_description + '", '
+      query += 'task_description="' + con.escape(element.task_description) + '", '
 
     } else {
       query += 'task_description=NULL, '
@@ -108,11 +108,12 @@ router.post('/save', (req, res) => {
       if( err ) {
         console.log(err);
         res.send(err);
-        return;
+        throw err;
       }  
 
       console.log('Updated task with task_id ' + element.task_id + ' with: ' + element[0]);
-    });
+    });    
+
   });
 
   res.sendStatus(200);
