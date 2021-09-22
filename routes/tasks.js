@@ -90,7 +90,7 @@ router.post('/save', (req, res) => {
     // Build our query
     let query = "UPDATE tasks SET ";
     if(element.task_description != null) {
-      query += 'task_description="' + con.escape(element.task_description) + '", '
+      query += 'task_description="' + element.task_description + '", '
 
     } else {
       query += 'task_description=NULL, '

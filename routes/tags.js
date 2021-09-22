@@ -61,7 +61,8 @@ router.post('/save', (req, res) => {
   const tags = req.body;
   tags.forEach((element) => {
     let query = 'UPDATE tags SET ';
-    query += 'tag_text="' + con.escape(element.tag_text) + '", ';
+    
+    query += 'tag_text="' + element.tag_text + '", ';
     query += 'tag_fg="' + element.tag_fg + '", ';
     query += 'tag_bg="' + element.tag_bg + '" ';
     query += 'WHERE tag_id=' + element.tag_id + ';';
