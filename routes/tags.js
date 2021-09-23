@@ -40,7 +40,7 @@ router.post('/new', (req, res) => {
 
   let con = db.make_connection();
 
-  const query = 'INSERT INTO tags (tag_text, tag_fg, tag_bg) VALUES ("New Tag", "#ffffff", "#000000");';
+  const query = 'INSERT INTO tags (tag_text, tag_fg, tag_bg) VALUES ("Empty Tag", "#ffffff", "#000000");';
   con.query(query, (err, result, something) => {
     if( err ) {
       res.send(err)
@@ -60,13 +60,16 @@ router.post('/save', (req, res) => {
 
   const tags = req.body;
   tags.forEach((element) => {
-    let query = 'UPDATE tags SET ';
     
-    query += 'tag_text="' + element.tag_text + '", ';
-    query += 'tag_fg="' + element.tag_fg + '", ';
-    query += 'tag_bg="' + element.tag_bg + '" ';
-    query += 'WHERE tag_id=' + element.tag_id + ';';
-    con.query(query, (err, result, something) => {
+    
+    let query = 'UPDATE tags SET tag_text=?, tag_fg=?, tag_bg=? WHERE tag_id=?;';
+
+    const tag = element.tag_text
+    const fg = element.tag_fg
+    const bg = element.tag_bg
+    const id = element.tag_id
+
+    con.query(query, [tag, fg, bg, id], (err, result, something) => {
       if( err ) {
         res.send(err)
         throw err;
@@ -90,23 +93,23 @@ router.delete('/delete/selected', (req, res) => {
 
     // We must delete tag relations from the task_tags table before
     // deleting any tags.
-    const q1 = 'DELETE FROM task_tags WHERE tag_id=' + element + ';';
-    con.query(q1, (err, result, something) => {
+    const q1 = 'DELETE FROM task_tags WHERE tag_id=?;';
+    con.query(q1, [element], (err, result, something) => {
       if( err ) {
         console.log(err);
-      res.send(err);
-      return;
+        res.send(err);
+        return;
       }  
 
       console.log("Deleted task_tag with tag_id " + element + " from task_tags.");
     });
 
-    const q2 = 'DELETE FROM tags WHERE tag_id=' + element + ';';
-    con.query(q2, (err, result, something) => {
+    const q2 = 'DELETE FROM tags WHERE tag_id=?;';
+    con.query(q2, [element], (err, result, something) => {
       if( err ) {
         console.log(err);
-      res.send(err);
-      return;
+        res.send(err);
+        return;
       }  
 
       console.log("Deleted tag with tag_id " + element + " from tags.");

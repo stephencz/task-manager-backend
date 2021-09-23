@@ -25,15 +25,18 @@ router.post('/save', (req, res) => {
   
   const body = req.body[0];
 
-  const query = "INSERT INTO task_tags (task_id, tag_id) VALUES (" + body.task_id + ", " + body.tag_id + ");" 
-  con.query(query, (err, result, something) => {
+  const task_id = body.task_id
+  const tag_id = body.tag_id
+
+  const query = "INSERT INTO task_tags (task_id, tag_id) VALUES (?, ?);" 
+  con.query(query, [task_id, tag_id], (err, result, something) => {
     if(err) {
       console.log(err);
       res.send(err);
       return;
     }
 
-    console.log("Added task tag with relationship " + body.task_id + ":" + body.tag_id + ".");
+    console.log("Added task tag with relationship " + task_id + ":" + tag_id + ".");
     res.sendStatus(200);
   })
 
@@ -45,9 +48,8 @@ router.delete('/delete', (req, res) => {
   let con = db.make_connection();
 
   const remove  = req.query.remove;
-  console.log(remove)
-  const query = "DELETE FROM task_tags WHERE task_tag_id=" + remove[0] + ";"
-  con.query(query, (err, result, something) => {
+  const query = "DELETE FROM task_tags WHERE task_tag_id=?;"
+  con.query(query, [remove[0]], (err, result, something) => {
     if(err) {
       console.log(err);
       res.send(err);

@@ -88,27 +88,23 @@ router.post('/save', (req, res) => {
   tasks.forEach((element) => {
 
     // Build our query
-    let query = "UPDATE tasks SET ";
-    if(element.task_description != null) {
-      query += 'task_description="' + element.task_description + '", '
+    let query = "UPDATE tasks SET task_description=?, task_date=? WHERE task_id=?;";
 
-    } else {
-      query += 'task_description=NULL, '
-    }
+    
+    const desc = element.task_description.trim();
 
+    let date = null;
     if(element.task_date != null) {
-      query += 'task_date=DATE_FORMAT("' + parseDateString(element.task_date) + '", "%Y-%m-%d") ';
-    } else {
-      query += 'task_date=NULL '
-    }
+      date = parseDateString(element.task_date);
+    } 
 
-    query += 'WHERE task_id=' + element.task_id + ';';
+    const id = element.task_id;
 
-    con.query(query, (err, result, something) =>  {
+    con.query(query, [desc, date, id], (err, result, something) =>  {
       if( err ) {
         console.log(err);
         res.send(err);
-        throw err;
+        return;
       }  
 
       console.log('Updated task with task_id ' + element.task_id + ' with: ' + element[0]);
@@ -130,8 +126,8 @@ router.delete('/delete/selected', (req, res) => {
 
     // Because we use task_tags to map tags to tasks we need to make
     // sure to remove any relationship from task_tags before removing our tag.
-    const q1 = 'DELETE FROM task_tags WHERE task_id=' + element + ';';
-    con.query(q1, (err, result, something) => {
+    const q1 = 'DELETE FROM task_tags WHERE task_id=?;';
+    con.query(q1, [element], (err, result, something) => {
       if( err ) {
         console.log(err);
         res.send(err);
@@ -141,8 +137,8 @@ router.delete('/delete/selected', (req, res) => {
       console.log("Deleted task_tags matching task_id " + element + " from task_tags.");
     });
 
-    const q2 = 'DELETE FROM tasks WHERE task_id=' + element + ';';
-    con.query(q2, (err, result, something) => {
+    const q2 = 'DELETE FROM tasks WHERE task_id=?;';
+    con.query(q2, [element], (err, result, something) => {
       if( err ) {
         console.log(err);
         res.send(err);
