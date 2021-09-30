@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 
 const taskRouter = require('./routes/tasks');
 const tagRouter = require('./routes/tags');
@@ -10,6 +11,7 @@ const taskTagsRouter = require('./routes/task_tags');
 const port = process.env.HOST_PORT || 8000
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({
   extended: true
